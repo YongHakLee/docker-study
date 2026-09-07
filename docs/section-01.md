@@ -1,3 +1,5 @@
+# 01. Dive Into Docker!
+
 - Image: Single file with all the deps and config required to run a program
 - Container: Instance of an image. Runs a program.
 
@@ -6,3 +8,10 @@
 
 - Control Groups: Limit amount of resources used per process
   - Memory, CPU Usage, HD I/O, Network Bandwith
+
+- Q1: What's the purpose of an image?
+  - A1: Images are used to create containers.
+- Q2: What goes on inside of a container?
+  - A2: Containers wrap up a program and limit what files that program can access.
+- Q3: What are the two primary parts of an image?
+  - A3: A primary command and a set of files.

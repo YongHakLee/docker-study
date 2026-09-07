@@ -1,33 +1,35 @@
-- Listing Containers
+# 02. Manipulating Containers with the Docker Client
+
+## Listing Containers
 
 ```shell
 docker ps
 docker ps --all
 ```
 
-- Container Lifecyle
+## Container Lifecyle
 
 `docker run = docker create + docker start`
 
-- Restarting Stopped Containers
+## Restarting Stopped Containers
 
 ```shell
 docker start ID
 ```
 
-- Removing Stopped Containers
+## Removing Stopped Containers
 
 ```shell
 docker system prune
 ```
 
-- Retrieving Log Outputs
+## Retrieving Log Outputs
 
 ```shell
 docker logs ID
 ```
 
-- Stopping Containers
+## Stopping Containers
 
 ```shell
 docker stop ID
@@ -38,3 +40,55 @@ docker stop ID
 docker kill ID
 # SIGKILL
 ```
+
+## Quiz
+
+- Q1: You need to debug a container that ran yesterday and exited. Which command would help you see what happened without restarting it?
+  - A1: `docker logs CONTAINER_ID`
+- Q2: A container with status "Exited (0)" in `docker ps -a` indicates what?
+  - A2: The container's main process completed successfully.
+- Q3: Your team member created a container that processes data files. The container ID is abc123. How would you run the same processing job again?
+  - A3: `docker start abc123`
+- Q4: A container was created with `docker create ubuntu echo "test"`. After starting it once, can you change it to run `echo "production"` instead?
+  - A4: No, you must create a new container with the new command. The command `echo "test"` becomes part of the container's immutable configuration.
+
+## Executing Commands in Running Containers
+
+```shell
+docker exec -it <container id> <command>
+```
+
+- `docker`: Reference the Docker Client
+- `exec`: Run another command
+- `-it`: Allow us to provide input to the container
+
+## The Purpose of the IT Flag
+
+- Process in Linux Environment
+  - Stuff you type -> `STDIN`
+  - `STDOUT` -> Stuff that shows up on the screen
+  - `STDERR` -> Stuff that shows up on the screen
+
+- `-it`
+  - `-i`: STDIN in process
+  - `-t`: text nicely
+
+## Getting a Command Prompt in a Container
+
+- Starting with a Shell
+
+```shell
+docker exec -it <container id> sh
+docker run -it <container id> sh
+```
+
+## Quize
+
+- A1: A container is running a Node.js application. You need to check with npm packages are installed. Which command would accomplish this?
+  - Q1: `docker exec CONTAINER_ID npm list`
+- A2: What is the relationship between stdin, stdout, and the `-it` flags?
+  - Q2: `-i` connects to stdin, `-t` formats the terminal output.
+- A3: A container process writes error messages. If you run the container without specifying any attach flags (such as `-a stderr`), where will the stderr output typically go?
+  - Q3: Without proper flags, stderr output would be lost.
+- A4: You need to debug a web application running in a container. Which approach would give you the most flexibility for troubleshooting?
+  - Q4: Using `docker exec -it CONTAINER_ID sh` to get shell access. You can inspect logs, config files, environment variables, network settings, and running services from inside the environment.
