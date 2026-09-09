@@ -1,4 +1,4 @@
-# 03. Building Custom Images THrough Docker Server
+# 03. Building Custom Images Through Docker Server
 
 ## Creating Docker Images
 
@@ -51,3 +51,101 @@ CMD ["node", "-e", "console.log('hi there');"]
 
 - Q4: Are all custom images required to use `alpine` as a base image?
   - A4: No.
+
+## Rebulids with Cache
+
+```shell
+FROM alpine
+
+# Step 2: Download and install dependency
+
+
+RUN apk add --update redis
+# Using Cache
+
+RUN apk add --update gcc
+
+# Step 3: Tell the image what to do when it starts as container
+
+CMD ["redis-server"]
+```
+
+- Ordering the commands is related with the Cache.
+
+## Tagging an Image
+
+```shell
+docker build -t feint225/redis:latest .
+```
+
+- `feint225/redis:latest`: Tags the image
+  - `DOCKER_ID/REPO_NAME:VERSION`
+- `.`: Specifies the directory of files/folders to use for the build
+
+```shell
+docker run feint225/redis
+```
+
+## Quiz
+
+### Q1
+
+You are working on Python project, writing code to work with _only Python v3.8._ You write a Dockerfile like the following to run your code:
+
+```shell
+FROM python
+RUN ["python", "main.py"]
+```
+
+You build your image, create a container from it, and everything works!
+
+Then, _three years in the future_, you make a change to this project and rebuild the image. When you try to create a container, you get an error message!
+
+**What is one possible reason to explain the error message you see?**
+
+### A1
+
+We didn't specify a version of the `python` image to use, so Docker automatically used the `latest` tag. That means we might have got Python v3.8 during the initial build, but maybe Python v4.5 (or some future version) when we rebuild the image three years later.
+
+### Q2
+
+If you ran the command `docker build . -t app1` how would you run the image that gets created?
+
+### A2
+
+`docker run app1`
+
+### Q3
+
+After running the command `docker build .` you see the following output:
+
+```shell
+=> => exporting layers                              0.0s
+=> => writing image sha256:9dfadec01fefd446b8a918b  0.0s
+```
+
+How would you tag this image with a tag of `app1`?
+
+### A3
+
+`docker tag 9dfa app1`
+
+### Q4
+
+Which of the following `tag` commands correctly follows naming conventions?
+
+### A4
+
+`docker tag ece24c dockeruser/my-fancy-image`
+
+### Q5
+
+You decide to use an image created by another engineer with the following name:
+
+`dockeruser/webapp:1.4.3-alpine3.10`
+
+Which of the following is true?
+
+### A5
+
+This is image version 1.4.3. It likely used a base image of Alpine v3.10

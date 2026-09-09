@@ -1,0 +1,8 @@
+version: '3' # Version of docker-compose
+services:
+  redis-server: # host name, connection URL
+    image: 'redis'
+  node-app:
+    build: .
+    ports:
+      - "4001:8081"
