@@ -3,6 +3,7 @@ services:
   redis-server: # host name, connection URL
     image: 'redis'
   node-app:
+    restart: on-failure
     build: .
     ports:
       - "4001:8081"
