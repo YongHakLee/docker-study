@@ -46,13 +46,12 @@ docker run -p 8080:8080 feint225/visits
 
 ### Restart Policies
 
-- "no": Never attempt to restart this . container if it stops or crashes. (no means false in YAML.)
-- always: If this container stops _for any reason_ always attempt to restart it.
-- on-failure: Only restart if the container stops with an error code.
-- unless-stopped: Always restart unless we (the developers) forcibly stop it.
+- `"no"`: Never attempt to restart this . container if it stops or crashes. (no means false in YAML.)
+- `always`: If this container stops _for any reason_ always attempt to restart it.
+- `on-failure`: Only restart if the container stops with an error code.
+- `unless-stopped`: Always restart unless we (the developers) forcibly stop it.
 
 ```yml
-version: "3" # Version of docker-compose
 services:
   redis-server: # host name, connection URL
     image: "redis"

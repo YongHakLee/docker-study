@@ -32,11 +32,15 @@ COPY . .
 CMD ["npm", "run", "start"]
 ```
 
-- `docker build -f Dockerfile.dev .`
+```shell
+`docker build -f Dockerfile.dev .`
+```
 
 ## Starting The Container
 
-- `docker run -p 3000:3000 IMAGE_ID`
+```shell
+`docker run -p 3000:3000 IMAGE_ID`
+```
 
 ## Docker Volumes
 
@@ -61,7 +65,7 @@ services:
       - "3000:3000"
     volumes:
       - /app/node_modules
-      - .:/app
+      - .:/app # $(pwd):/app
 ```
 
 ## Overriding Dockerfile Selection
@@ -78,10 +82,14 @@ services:
       - "3000:3000"
     volumes:
       - /app/node_modules
-      - .:/app
+      - .:/app # $(pwd):/app
 ```
 
 ## Do We Need Copy?
+
+```shell
+COPY . .
+```
 
 - Yes, for future...
 
@@ -91,7 +99,7 @@ services:
 docker run IMAGE_ID npm run test
 ```
 
-- for see inside of it
+- To see inside of it: `-it`
 
 ```shell
 docker run -it IMAGE_ID npm run test
@@ -99,9 +107,32 @@ docker run -it IMAGE_ID npm run test
 
 ## Live Updating Tests
 
+- Compare the number of 'Tests'
+
+```js
+// frontend/src/App.test.js
+
+import { render, screen } from "@testing-library/react";
+import App from "./App";
+
+test("renders learn react link", () => {
+  // test 1
+  render(<App />);
+  const linkElement = screen.getByText(/learn react/i);
+  expect(linkElement).toBeInTheDocument();
+});
+
+test("renders learn react link", () => {
+  // test 2
+  render(<App />);
+  const linkElement = screen.getByText(/learn react/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+
 ```shell
 docker compose up
-docker exec -it CONTAINER_ID npm run test
+docker exec -it CONTAINER_ID npm run test # In the second terminal
 ```
 
 ## Docker Compose for Running Tests
@@ -132,4 +163,76 @@ services:
 
 ## Shortcomings on Testing
 
-- Continue with `attach`
+- Test Container
+  - `npm run test`
+  - stdin / stdout / stderr
+
+- Web Container
+  - `npm run start`
+  - stdin / stdout / stderr
+
+- Our terminal connect to `stdin` of the primary process.
+
+```shell
+docker attach CONTAINER_ID
+# enter q, p, ... not available
+```
+
+```shell
+docker exec -it CONTAINER_ID sh
+ps
+```
+
+- There are many processes.
+- But our terminal connect to `stdin` of the primary process.
+
+## Need for Nginx
+
+- Dev Server -> Production Server (Nginx)
+
+## Multi-Step Docker Builds
+
+1. Use node:lts-alpine
+2. Copy the package.json file
+3. Install dependencies
+
+- Deps only needed to execute 'npm run build'!
+
+4. Run 'npm run build'
+5. Start nginx
+
+- Where's nginx from?
+
+### Build Phase
+
+1. Use node:lts-alpine
+2. Copy the package.json file
+3. Install dependencies
+4. Run 'npm run build'
+
+### Run Phase
+
+1. Use nginx
+2. Copy over the result of 'npm run build'
+3. Start nginx
+
+## Running Nginx
+
+```dockerfile
+# dockerfile
+FROM node:lts-alpine AS builder
+
+WORKDIR '/app'
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx
+COPY --from=builder /app/build /usr/share/nginx/html
+```
+
+```shell
+docker build .
+docker run -p 8080:80 IMAGE_ID
+```
